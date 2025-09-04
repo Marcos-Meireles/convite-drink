@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite dos Peixinhos - Diálogo Automático</title>
+
+    <style>
+        /* --- ESTILOS (CSS) --- */
+
+        /* Configurações gerais da página */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #001f3f; /* Azul marinho escuro */
+        }
+
+        /* O fundo do oceano */
+        .ocean {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #4f9dff 0%, #1a5db5 50%, #002d66 100%);
+            overflow: hidden;
+        }
+
+        /* Raios de luz vindo de cima */
+        .ocean::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.2), transparent 70%);
+            transform: translateX(-50%) rotate(25deg);
+            animation: light-shimmer 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes light-shimmer {
+            from { opacity: 0.5; transform: translateX(-50%) rotate(25deg) scale(1); }
+            to { opacity: 0.8; transform: translateX(-45%) rotate(35deg) scale(1.2); }
+        }
+
+        /* Bolhas subindo */
+        .bubbles span {
+            position: absolute;
+            bottom: -50px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: rise linear infinite;
+            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+        }
+
+        @keyframes rise {
+            to {
+                transform: translateY(-110vh);
+                opacity: 0;
+            }
+        }
+        .bubbles span:nth-child(1) { left: 10%; width: 20px; height: 20px; animation-duration: 15s; }
+        .bubbles span:nth-child(2) { left: 20%; width: 10px; height: 10px; animation-duration: 10s; animation-delay: 2s; }
+        .bubbles span:nth-child(3) { left: 85%; width: 15px; height: 15px; animation-duration: 12s; animation-delay: 4s; }
+        .bubbles span:nth-child(4) { left: 50%; width: 25px; height: 25px; animation-duration: 18s; animation-delay: 1s; }
+        .bubbles span:nth-child(5) { left: 90%; width: 12px; height: 12px; animation-duration: 9s; animation-delay: 5s; }
+
+
+        /* --- ESTILOS DOS PEIXES --- */
+        .fish {
+            position: absolute;
+            width: 150px;
+            height: 80px;
+            cursor: pointer;
+            z-index: 50;
+        }
+        .fish-body { position: absolute; width: 120px; height: 70px; border-radius: 50%; top: 5px; left: 10px; }
+        .eye { position: absolute; top: 25px; left: 95px; width: 12px; height: 12px; background-color: #000; border-radius: 50%; box-shadow: 0 0 5px rgba(255,255,255,0.7); }
+        .eye::after { content: ''; position: absolute; top: 2px; left: 3px; width: 4px; height: 4px; background-color: white; border-radius: 50%; }
+        .mouth { position: absolute; top: 40px; left: 105px; width: 10px; height: 5px; border-radius: 0 0 5px 5px; transform: rotate(-10deg); }
+        .fin-top { position: absolute; top: -10px; left: 50px; width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-radius: 10px; transform: rotate(-10deg); }
+        .fin-bottom { position: absolute; bottom: 5px; left: 60px; width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-radius: 10px; transform: rotate(10deg); }
+        .fish-tail { position: absolute; top: 15px; left: -40px; width: 60px; height: 50px; border-radius: 0 80% 80% 0 / 0 100% 100% 0; transform: rotate(55deg); box-shadow: inset 0 0 10px rgba(0,0,0,0.3); animation: wag-tail 1s ease-in-out infinite alternate; }
+
+        /* Estilos do Peixe Dourado */
+        #goldfish .fish-body { background: radial-gradient(circle at 30% 30%, #FFD700 0%, #FFA500 100%); box-shadow: inset -5px -5px 15px rgba(0,0,0,0.2), 0 0 15px rgba(255,215,0,0.5); }
+        #goldfish .mouth { background-color: #A0522D; }
+        #goldfish .fin-top { border-bottom: 30px solid #FF8C00; }
+        #goldfish .fin-bottom { border-top: 25px solid #FF8C00; }
+        #goldfish .fish-tail { background: radial-gradient(circle at 50% 50%, #FF8C00 0%, #FFA500 100%); }
+
+        /* Estilos do Peixe Vermelho */
+        #redfish .fish-body { background: radial-gradient(circle at 30% 30%, #ff4b2b 0%, #ff416c 100%); box-shadow: inset -5px -5px 15px rgba(0,0,0,0.3), 0 0 15px rgba(255,65,108,0.5); }
+        #redfish .mouth { background-color: #8B0000; }
+        #redfish .fin-top { border-bottom: 30px solid #dc143c; }
+        #redfish .fin-bottom { border-top: 25px solid #dc143c; }
+        #redfish .fish-tail { background: radial-gradient(circle at 50% 50%, #dc143c 0%, #ff416c 100%); }
+
+        /* Animações dos peixes (sem virar) */
+        #goldfish { top: 60%; animation: swim 20s linear infinite; }
+        #redfish { top: 40%; animation: swim 22s linear infinite; animation-delay: -5s; }
+
+        @keyframes swim {
+            0% {
+                left: -180px; /* Começa fora da tela na esquerda */
+                transform: translateY(0);
+            }
+            25% { transform: translateY(-20px); } /* Sobe e desce um pouco */
+            50% { transform: translateY(20px); }
+            75% { transform: translateY(-10px); }
+            100% {
+                left: 100vw; /* Termina fora da tela na direita */
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes wag-tail {
+            from { transform: rotate(45deg); }
+            to { transform: rotate(65deg) translateX(5px); }
+        }
+
+        /* --- Bolhas de Mensagem --- */
+        .bubble {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            padding: 15px 25px;
+            border-radius: 50%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2), inset 0 0 10px rgba(255,255,255,0.8);
+            font-size: 1.2em;
+            color: #333;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform-origin: center bottom;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        #bubble-red { width: 280px; height: 130px; font-size: 1.1em; } /* Ajustado para a mensagem maior */
+        #bubble-gold { width: 120px; height: 120px; }
+        
+        .bubble.hidden {
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+        }
+
+        /* Instruções na tela */
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            opacity: 0.8;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ocean">
+        
+        <div class="bubbles">
+            <span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <div id="redfish" class="fish fish--red">
+            <div class="fish-body"></div>
+            <div class="fish-tail"></div>
+            <div class="eye"></div>
+            <div class="mouth"></div>
+            <div class="fin-top"></div>
+            <div class="fin-bottom"></div>
+        </div>
+        
+        <div id="goldfish" class="fish">
+            <div class="fish-body"></div>
+            <div class="fish-tail"></div>
+            <div class="eye"></div>
+            <div class="mouth"></div>
+            <div class="fin-top"></div>
+            <div class="fin-bottom"></div>
+        </div>
+
+        <div id="bubble-red" class="bubble hidden">
+            Oi peixinha dourada, vamos beber uns drinks hoje?
+        </div>
+        <div id="bubble-gold" class="bubble hidden">
+            Sim!
+        </div>
+    </div>
+
+    <div class="instructions">
+        <p>Clique no peixe vermelho!</p>
+    </div>
+
+    <script>
+        // --- JAVASCRIPT ATUALIZADO PARA O DIÁLOGO AUTOMÁTICO ---
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const redFish = document.getElementById('redfish');
+            const goldFish = document.getElementById('goldfish');
+            const redBubble = document.getElementById('bubble-red');
+            const goldBubble = document.getElementById('bubble-gold');
+
+            function updateBubblePosition(fish, bubble) {
+                if (!fish || !bubble) return; 
+                const fishRect = fish.getBoundingClientRect();
+                
+                bubble.style.left = ${fishRect.left + fishRect.width / 2 - bubble.offsetWidth / 2}px;
+                bubble.style.top = ${fishRect.top - bubble.offsetHeight - 20}px;
+            }
+
+            // Evento de clique para o PEIXE VERMELHO
+            redFish.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                
+                // Esconde as bolhas se já estiverem visíveis para reiniciar o diálogo
+                redBubble.classList.add('hidden');
+                goldBubble.classList.add('hidden');
+
+                // Mostra a bolha do peixe vermelho
+                redBubble.classList.remove('hidden');
+                updateBubblePosition(redFish, redBubble);
+
+                // Mostra a bolha do peixe dourado automaticamente após um pequeno atraso
+                setTimeout(() => {
+                    goldBubble.classList.remove('hidden');
+                    updateBubblePosition(goldFish, goldBubble);
+                }, 1000); // 1 segundo de atraso para a resposta aparecer
+            });
+
+            // Clicar em qualquer outro lugar esconde AMBAS as bolhas
+            document.addEventListener('click', (event) => {
+                // Verifica se o clique não foi em nenhuma das bolhas ou peixes
+                const clickedOnBubble = redBubble.contains(event.target) || goldBubble.contains(event.target);
+                const clickedOnFish = redFish.contains(event.target) || goldFish.contains(event.target);
+
+                if (!clickedOnBubble && !clickedOnFish) {
+                    redBubble.classList.add('hidden');
+                    goldBubble.classList.add('hidden');
+                }
+            });
+
+            // Atualiza a posição das bolhas que estiverem visíveis continuamente
+            setInterval(() => {
+                if (!redBubble.classList.contains('hidden')) {
+                    updateBubblePosition(redFish, redBubble);
+                }
+                if (!goldBubble.classList.contains('hidden')) {
+                    updateBubblePosition(goldFish, goldBubble);
+                }
+            }, 50); 
+        });
+    </script>
+</body>
+</html>
