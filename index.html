@@ -214,9 +214,10 @@
                 if (!fish || !bubble) return; 
                 const fishRect = fish.getBoundingClientRect();
                 
-                bubble.style.left = ${fishRect.left + fishRect.width / 2 - bubble.offsetWidth / 2}px;
-                bubble.style.top = ${fishRect.top - bubble.offsetHeight - 20}px;
+                bubble.style.left = `${fishRect.left + fishRect.width / 2 - bubble.offsetWidth / 2}px`;
+                bubble.style.top = `${fishRect.top - bubble.offsetHeight - 20}px`;
             }
+
 
             // Evento de clique para o PEIXE VERMELHO
             redFish.addEventListener('click', (event) => {
